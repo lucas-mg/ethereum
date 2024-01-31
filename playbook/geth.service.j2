@@ -1,0 +1,10 @@
+[Unit]
+Description=Ethereum Geth node
+
+[Service]
+ExecStart=/usr/bin/geth --datadir=/home/ethereum/.ethereum --networkid 1 --rpc --rpcaddr 0.0.0.0 --rpcport 8545
+Restart=always
+User=ethereum
+
+[Install]
+WantedBy=default.target
