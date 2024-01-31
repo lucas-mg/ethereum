@@ -1,0 +1,51 @@
+---
+- name: Ethereum Node Setup
+  hosts: your_ethereum_node
+  become: true
+
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - software-properties-common
+          - python3-pip
+          - unzip
+        state: present
+
+    - name: Add Ethereum Geth PPA
+      apt_repository:
+        repo: ppa:ethereum/ethereum
+
+    - name: Install Ethereum client (Geth)
+      apt:
+        name: ethereum
+        state: present
+
+    - name: Create Ethereum user
+      user:
+        name: ethereum
+        home: /home/ethereum
+        shell: /bin/bash
+        createhome: yes
+
+    - name: Download and extract Ethereum Genesis file (replace with your file URL)
+      get_url:
+        url: "https://example.com/genesis.json"
+        dest: /home/ethereum/genesis.json
+      notify: Restart Geth
+
+    - name: Configure Geth service
+      template:
+        src: geth.service.j2
+        dest: /etc/systemd/system/geth.service
+      notify: Restart Geth
+
+  handlers:
+    - name: Restart Geth
+      systemd:
+        name: geth
+        state: restarted
